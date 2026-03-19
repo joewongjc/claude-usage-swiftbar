@@ -1,35 +1,35 @@
-# Claude Usage SwiftBar Plugin
+# Claude 用量监控 SwiftBar 插件
 
-English | [中文](README.zh-CN.md)
+中文 | [English](README.en.md)
 
-A macOS menu bar plugin that displays your Claude Code usage at a glance. Built for [SwiftBar](https://github.com/swiftbar/SwiftBar).
+macOS 菜单栏插件，一眼掌握 Claude Code 用量。基于 [SwiftBar](https://github.com/swiftbar/SwiftBar)。
 
-Shows weekly usage, model-specific breakdowns (Sonnet/Opus), 5-hour burst limits, and extra usage credits with color-coded progress bars.
+官方自带的 Usage 只告诉你用了多少百分比，但不告诉你离下次重置还剩多久。80% 的用量剩 5 天和剩 2 小时，完全是两回事。这个插件把**用量进度**和**时间进度**放在一起对比，让你一目了然。
 
-## Features
+## 功能
 
-- **Real-time usage tracking** - Weekly (7-day), per-model (Sonnet/Opus), and 5-hour burst usage
-- **Color-coded progress bars** - 5-tier color system (green/blue/yellow/orange/red) so you know at a glance how much quota remains
-- **Time progress** - See how much of each usage window has elapsed
-- **Extra usage credits** - Track overage spending if enabled
-- **Smart caching** - 30-minute cache to avoid API rate limits, with manual refresh option
-- **Auto plan detection** - Displays your subscription tier (Pro, Max, Max 5x, Max 20x)
+- **实时用量监控** - Weekly (7 天)、Sonnet/Opus 分模型、5 小时 Burst 窗口
+- **五档颜色进度条** - 绿/蓝/黄/橙/红，抬头瞄一眼就知道配额够不够
+- **时间进度对比** - 用量 55% 但时间已过 90%？放心用，富余得很
+- **超额用量追踪** - 开启了 Extra Usage 的话，显示消费金额和额度
+- **智能缓存** - 30 分钟缓存避免 API 限流，支持手动刷新
+- **自动识别套餐** - 自动显示 Pro / Max / Max 5x / Max 20x
 
-## Requirements
+## 前置条件
 
-- **macOS** (SwiftBar is macOS-only)
-- **Claude Code** with OAuth login (`claude login`)
-- **Python 3.9+** (included with macOS)
+- **macOS**（SwiftBar 仅支持 macOS）
+- **Claude Code**，且已通过 `claude login` 登录（OAuth 认证）
+- **Python 3.9+**（macOS 自带）
 
-> **Note:** This plugin reads OAuth credentials from macOS Keychain. It does NOT work with API key authentication (`ANTHROPIC_API_KEY`). You must be logged in via `claude login`.
+> **注意:** 插件通过 macOS Keychain 读取 OAuth 凭证，不支持 API Key 方式（`ANTHROPIC_API_KEY`）。必须先用 `claude login` 登录。
 
-## Install
+## 安装
 
-### One-liner (with Claude Code)
+### 用 Claude Code 安装（推荐）
 
-Give this repo URL to your Claude Code and ask it to install.
+把这个 repo 链接丢给你的 Claude Code，让它帮你装就行。
 
-### Manual
+### 手动安装
 
 ```bash
 git clone https://github.com/joewongjc/claude-usage-swiftbar.git
@@ -37,17 +37,17 @@ cd claude-usage-swiftbar
 ./install.sh
 ```
 
-The install script will:
-1. Install [SwiftBar](https://github.com/swiftbar/SwiftBar) via Homebrew (if needed)
-2. Verify your Claude Code OAuth credentials
-3. Copy the plugin to `~/Library/SwiftBar/`
-4. Start SwiftBar if not running
+安装脚本会自动:
+1. 通过 Homebrew 安装 [SwiftBar](https://github.com/swiftbar/SwiftBar)（如果没装）
+2. 检查 Claude Code OAuth 凭证是否存在
+3. 复制插件到 `~/Library/SwiftBar/`
+4. 启动 SwiftBar（如果没运行）
 
-## What it looks like
+## 效果展示
 
-Menu bar shows: `◆ 55%` (your weekly usage percentage, color changes with usage level)
+菜单栏显示: `◆ 55%`（周用量百分比，颜色随用量变化）
 
-Clicking reveals a dropdown with detailed breakdowns:
+点击展开详情:
 
 ```
 Claude Max 5x
@@ -68,33 +68,33 @@ Claude Max 5x
 立即刷新
 ```
 
-### Color Scale
+### 颜色含义
 
-| Usage | Color | Meaning |
-|-------|-------|---------|
-| 0-19% | 🟢 Green | Plenty of quota |
-| 20-39% | 🔵 Blue | Normal usage |
-| 40-59% | 🟡 Yellow | Over halfway |
-| 60-79% | 🟠 Orange | Getting tight |
-| 80-100% | 🔴 Red | Running low |
+| 用量 | 颜色 | 含义 |
+|------|------|------|
+| 0-19% | 🟢 绿色 | 配额充裕 |
+| 20-39% | 🔵 蓝色 | 正常使用 |
+| 40-59% | 🟡 黄色 | 已过半 |
+| 60-79% | 🟠 橙色 | 有点吃紧 |
+| 80-100% | 🔴 红色 | 快用完了 |
 
-## Configuration
+## 配置
 
-The plugin refreshes every 5 minutes (configured via the filename `claude-usage.5m.py`). To change the refresh interval, rename the file:
+插件每 5 分钟刷新一次（由文件名 `claude-usage.5m.py` 中的 `5m` 决定）。改文件名即可调整刷新频率:
 
-- `claude-usage.1m.py` - Every minute
-- `claude-usage.10m.py` - Every 10 minutes
-- `claude-usage.30m.py` - Every 30 minutes
+- `claude-usage.1m.py` - 每分钟
+- `claude-usage.10m.py` - 每 10 分钟
+- `claude-usage.30m.py` - 每 30 分钟
 
-API calls are cached for 30 minutes regardless of refresh interval to avoid rate limiting. You can click "立即刷新" to force a fresh API call when the cache expires.
+无论刷新频率如何，API 调用都有 30 分钟缓存以避免限流。缓存过期后点"立即刷新"可强制拉取最新数据。
 
-## Uninstall
+## 卸载
 
 ```bash
 rm ~/Library/SwiftBar/claude-usage.5m.py
 rm -f ~/.local/state/claude-usage-cache.json
 ```
 
-## License
+## 开源协议
 
 MIT
