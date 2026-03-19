@@ -1,5 +1,7 @@
 # Claude Usage SwiftBar Plugin
 
+English | [中文](README.zh-CN.md)
+
 A macOS menu bar plugin that displays your Claude Code usage at a glance. Built for [SwiftBar](https://github.com/swiftbar/SwiftBar).
 
 Shows weekly usage, model-specific breakdowns (Sonnet/Opus), 5-hour burst limits, and extra usage credits with color-coded progress bars.
