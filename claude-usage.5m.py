@@ -10,9 +10,13 @@
 import json
 import os
 import subprocess
+import sys
 import time
 import urllib.request
 from datetime import datetime, timezone
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import codex_usage
 
 KEYCHAIN_SERVICE = "Claude Code-credentials"
 API_URL = "https://api.anthropic.com/api/oauth/usage"
@@ -22,10 +26,11 @@ BAR_WIDTH = 20
 NOOP = "bash=/usr/bin/true terminal=false"
 
 PLAN_NAMES = {
+    "pro": "Claude Pro",
     "max": "Claude Max",
+    "claude_pro": "Claude Pro",
     "claude_max_5x": "Claude Max 5x",
     "claude_max_20x": "Claude Max 20x",
-    "claude_pro": "Claude Pro",
 }
 
 
@@ -153,7 +158,13 @@ def render(usage, oauth, cache_age=None):
     tier = "5x" if "5x" in tier_raw else ("20x" if "20x" in tier_raw else "")
     plan_str = plan if tier and tier in plan else f"{plan} {tier}".strip()
 
-    print(f"◆ {int(weekly_util)}% | color={bar_color} font=Menlo")
+    codex = codex_usage.get_usage()
+    codex_util = codex_usage.weekly_util(codex) if codex else None
+
+    title = f"◆ {int(weekly_util)}%"
+    if codex_util is not None:
+        title += f"  ⬡ {int(codex_util)}%"
+    print(f"{title} | font=Menlo")
     print("---")
     print(f"{plan_str} | size=12 {NOOP}")
     print("---")
@@ -186,6 +197,9 @@ def render(usage, oauth, cache_age=None):
         print(f"💳 超额用量  {used_str} | size=11 {NOOP}")
         print(f"  用量  {progress_bar(util_val)} {int(util_val*100):3d}% | font=Menlo size=11 color={usage_color(util_val)} {NOOP}")
         print("---")
+
+    if codex:
+        codex_usage.render(codex, progress_bar, usage_color, NOOP)
 
     if cache_age is not None:
         if cache_age < 60:

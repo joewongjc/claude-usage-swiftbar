@@ -2,6 +2,8 @@
 set -euo pipefail
 
 PLUGIN_NAME="claude-usage.5m.py"
+CODEX_MODULE="codex_usage.py"
+CODEX_OLD_PLUGIN="codex-usage.5m.py"
 SWIFTBAR_DIR="$HOME/Library/SwiftBar"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 KEYCHAIN_SERVICE="Claude Code-credentials"
@@ -42,13 +44,28 @@ if [[ ! -d "$SWIFTBAR_DIR" ]]; then
     mkdir -p "$SWIFTBAR_DIR"
 fi
 
-# 6. Copy plugin
-info "Installing plugin..."
+# 6. Copy Claude plugin
+info "Installing Claude plugin..."
 cp "$SCRIPT_DIR/$PLUGIN_NAME" "$SWIFTBAR_DIR/$PLUGIN_NAME"
 chmod +x "$SWIFTBAR_DIR/$PLUGIN_NAME"
 ok "Plugin installed to $SWIFTBAR_DIR/$PLUGIN_NAME"
 
-# 7. Launch SwiftBar if not running
+# 7. Copy Codex module (only if Codex is installed; no SwiftBar interval = not a plugin)
+if command -v codex &>/dev/null || [[ -d "$HOME/.codex/sessions" ]]; then
+    info "Codex detected — installing Codex module..."
+    cp "$SCRIPT_DIR/$CODEX_MODULE" "$SWIFTBAR_DIR/$CODEX_MODULE"
+    ok "Codex module installed to $SWIFTBAR_DIR/$CODEX_MODULE"
+else
+    info "Codex not found — skipping Codex module (usage will be Claude-only)."
+fi
+
+# Remove old standalone Codex plugin if present
+if [[ -f "$SWIFTBAR_DIR/$CODEX_OLD_PLUGIN" ]]; then
+    rm "$SWIFTBAR_DIR/$CODEX_OLD_PLUGIN"
+    info "Removed old standalone Codex plugin."
+fi
+
+# 8. Launch SwiftBar if not running
 if ! pgrep -q SwiftBar; then
     info "Starting SwiftBar..."
     open -a SwiftBar
@@ -63,5 +80,5 @@ if ! pgrep -q SwiftBar; then
 fi
 
 echo ""
-ok "Done! Look for the ◆ icon in your menu bar."
+ok "Done! Look for the ◆ icon in your menu bar (shows ◆ N%  ⬡ N% if Codex is active)."
 ok "The plugin refreshes every 5 minutes. Click it to see usage details."
